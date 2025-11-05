@@ -1,33 +1,34 @@
 # Documentación
 
 --- Funcionalidades ---
-1) Registro de zona.
+1) Registro de zona. Poner un evento primario y registrar el umbral predeterminado
 2) Ver temperatura Acual.
        - Funcion de busqueda de zona por nombre
        - Funcion ON//OFF segun el umbral
-4) Activar ventilador manualmente
+3) Activar ventilador manualmente
        - (X2) Funcion para buscar zona por noombre
-       - Funcion para apagar o prender ventilador
-   (cuenta como evento, a tomar en cuenta en el historial de eventos)
-6) ver historial de eventos POR ZONA 
+       - Registrarlo como evento para el ultimo elemento de la lista de eventos
+4) ver historial de eventos POR ZONA 
        - Struct anidado
-7) Simular monitoreo en tiempo real
+5) Simular monitoreo en tiempo real
        - Funcion para generar aleatoriamente( usando sleep y delay)
-8) Buscar eventos por rango de temperatura o fecha.
-       - Despues
-9) Generar reporte estasistico
+          - Cambiar de día por cada ejecución
+6) Buscar eventos por rango de temperatura o fecha.
+       - (X3) funcion para buscar zona por nombre
+          - Pedir temp minima y maxima y de ahi buscar
+7) Generar reporte estasistico
        - Recorre cada zona y dentro de cada zona su historial, dentro de cada historial cacula todo el pedo
-10) Exportar todo el historial a un CSV
+8) Exportar todo el historial a un CSV
        - Recorre cada zona y dentro de cada zona su historial, y guarda su historial
-11) condifurar umbral de temperatura por zona
-        - permite al usuario actualizar el ventilador manualmente
-        - (X3) Funcion de buscar zona por nombre
+9) condifurar umbral de temperatura por zona
+        - permite al usuario actualizar el umbral manualmente
+        - (X4) Funcion de buscar zona por nombre
         - (X2) Funcion de ON/OFF umbral automaticamente.
-12) Restaurar configuracion por defecto por zona.
-        - (X4) Funcion para buscar zona por nombre
+10) Restaurar configuracion por defecto por zona.
+        - (X5) Funcion para buscar zona por nombre
         - Restaura umbral y limpia su historial de eventos INDIVIDUAL.
 
-13) Validaciones
+11) Validaciones y así
 - Funcion
   
 ----CONSTANTES----
