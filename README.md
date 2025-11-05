@@ -1,3 +1,6 @@
-# Pia
-Nuestro pia
- aqui ponemos ma 
+# Documentación
+---VARIABLES---
+
+---FUNCIONES---
+
+---ESTRUCTURA---
