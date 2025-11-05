@@ -1,30 +1,30 @@
 # Documentación
 
 --- Funcionalidades ---
-1) Registro de zona. Poner un evento primario y registrar el umbral predeterminado
-2) Ver temperatura Acual.
-       - Funcion de busqueda de zona por nombre
+1) Registro de zona. Poner un evento primario y registrar el umbral predeterminado (LAZARO)
+2) Ver temperatura Acual. (EDSON)
+       - Funcion de busqueda de zona por nombre 
        - Funcion ON//OFF segun el umbral
-3) Activar ventilador manualmente
+3) Activar ventilador manualmente (LAZARO)
        - (X2) Funcion para buscar zona por noombre
        - Registrarlo como evento para el ultimo elemento de la lista de eventos
-4) ver historial de eventos POR ZONA 
+4) ver historial de eventos POR ZONA (FRAN)
        - Struct anidado
-5) Simular monitoreo en tiempo real
+5) Simular monitoreo en tiempo real (FRAN)
        - Funcion para generar aleatoriamente( usando sleep y delay)
           - Cambiar de día por cada ejecución
-6) Buscar eventos por rango de temperatura o fecha.
+6) Buscar eventos por rango de temperatura o fecha. (FRAN)
        - (X3) funcion para buscar zona por nombre
           - Pedir temp minima y maxima y de ahi buscar
-7) Generar reporte estasistico
+7) Generar reporte estasistico (LAZARO)
        - Recorre cada zona y dentro de cada zona su historial, dentro de cada historial cacula todo el pedo
-8) Exportar todo el historial a un CSV
+8) Exportar todo el historial a un CSV (LAZARO)
        - Recorre cada zona y dentro de cada zona su historial, y guarda su historial
-9) condifurar umbral de temperatura por zona
+9) condifurar umbral de temperatura por zona (EDSON)
         - permite al usuario actualizar el umbral manualmente
         - (X4) Funcion de buscar zona por nombre
         - (X2) Funcion de ON/OFF umbral automaticamente.
-10) Restaurar configuracion por defecto por zona.
+10) Restaurar configuracion por defecto por zona. (FRAN)
         - (X5) Funcion para buscar zona por nombre
         - Restaura umbral y limpia su historial de eventos INDIVIDUAL.
 
