@@ -140,7 +140,7 @@ float generarTemp(int min, int max){
     return temp;
 }
 
-void registrarZona(Zona **zonas, int *cont){
+void registrarZona(Zona **zonas, int *cont, float **tempPredet, int **contHistorial) {
     Zona nuevaZona;
     printf("Ingrese ID de la zona: ");
     scanf("%d", &nuevaZona.id);
@@ -154,9 +154,21 @@ void registrarZona(Zona **zonas, int *cont){
     scanf("%f", &nuevaZona.umbral);
     strcpy(nuevaZona.ventilador, "OFF");
 
+    nuevaZona.historiales =(Historial *) malloc(1*sizeof(Historial));
+    nuevaZona.historiales[0].idZona = nuevaZona.id;
+    nuevaZona.historiales[0].temperatura = 30.0;
+    nuevaZona.historiales[0].fecha = '30/06/2025';
+    nuevaZona.historiales[0].hora = '12:00';
+
     (*cont)++;
-    *zonas=realloc(*zonas, ((*cont)+1)*sizeof(Zona));
+    *zonas=realloc(*zonas, ((*cont))*sizeof(Zona));
     *zonas[(*cont) - 1] = nuevaZona;
+
+    *tempPredet=realloc(*tempPredet, ((*cont))*sizeof(float));
+    (*tempPredet)[(*cont) - 1] = nuevaZona.umbral;
+
+    *contHistorial=realloc(*contHistorial, ((*cont))*sizeof(int));
+    (*contHistorial)[(*cont) - 1] = 1;
 
     agregarArchivo(nuevaZona);
 }
@@ -177,5 +189,31 @@ void temperaturaActual( Zona **zonas, int *cont) {
         printf("Zona: %s\n", arr[i].nom);
         printf("Temperatura actual: %.2f °C\nEstado del Ventilador: %s\n\n",
         temp, arr[i].ventilador);
+    }
+}
+
+void activarVent(Zona **zonas, int *cont){
+    //funcion para buscar zona con nombre
+
+}
+
+void reporte(Zona **zonas, int *cont, int **contHistorial){
+    float suma=0.0,prom, tempmax=0.0, tempmin=100.0;
+    for(int i=0; i<(*cont); i++){
+        for(int j=0; j<*(contHistorial+i); j++){
+            suma+=(*zonas)[i].historiales[j].temperatura;
+            if ((*zonas)[i].historiales[j].temperatura>tempmax){
+                tempmax=(*zonas)[i].historiales[j].temperatura;
+            }
+            if((*zonas)[i].historiales[j].temperatura<tempmin){
+                tempmin=(*zonas)[i].historiales[j].temperatura;
+            }
+        }
+        prom=suma/(*(contHistorial+i));
+        printf("Zona: %s\n", (*zonas)[i].nom);
+        printf("Reporte estadistico:\n");
+        printf("Temperatura maxima: %.2f °C\n", tempmax);
+        printf("Temperatura minima: %.2f °C\n", tempmin);
+        printf("Temperatura promedio: %.2f °C\n\n", prom); 
     }
 }
