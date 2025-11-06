@@ -1,6 +1,6 @@
 # Documentación
 
---- Funcionalidades ---
+--- Funcionalidades --- DESCARGAR LA ESTRUCT AL ARCHIVO LUEGO DE CERRAR Y EN LA SIG. EJECUCION CARGAR DESDE EL ARCHIVO
 1) Registro de zona. Poner un evento primario y registrar el umbral predeterminado (LAZARO)
 2) Ver temperatura Acual. (EDSON)
        - Funcion de busqueda de zona por nombre 
