@@ -18,18 +18,27 @@ void escribirArchivo(Zona *zonas, int cont);
 
 void agregarArchivo(Zona zona);
 
-void listaZonas(); 
-
 float generarTemp(int min, int max);
 
 void registrarZona(Zona **zonas, int *cont);
 
-void temperaturaActual( Zona **zonas, int *cont);
-
 void limpiar_buffer();
 
 int validar_usuario();
-
 //void leer_cadena(const char* mensaje, char* cadena, int longitud);
+
+//Edson
+
+void listaZonas(); 
+
+Zona* buscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado);
+
+void actualizarVentilador( Zona *z);
+
+void temperaturaActual( Zona **zonas, int *cont);
+
+void cambiarUmbral(Zona *arr, int cont);
+
+
 
 #endif
