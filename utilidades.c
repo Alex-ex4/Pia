@@ -92,8 +92,23 @@ float leer_flotante(const char* mensaje) {
 }*/
 
 
+Zona* buscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado) {
+    for(int i = 0; i < cont ; i++) {
+        if(strcmp(arr[i].nom, nombreBuscado) == 0) {
+            return &arr[i];
+        }
+    }
+    return NULL;
+}
 
-
+int posBuscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado) {
+    for(int i = 0; i < cont ; i++) {
+        if(strcmp(arr[i].nom, nombreBuscado) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 void escribirArchivo(Zona *zonas, int cont){
@@ -152,13 +167,13 @@ void registrarZona(Zona **zonas, int *cont, float **tempPredet, int **contHistor
 
     printf("Ingrese umbral de temperatura: ");
     scanf("%f", &nuevaZona.umbral);
-    strcpy(nuevaZona.ventilador, "OFF");
 
     nuevaZona.historiales =(Historial *) malloc(1*sizeof(Historial));
     nuevaZona.historiales[0].idZona = nuevaZona.id;
-    nuevaZona.historiales[0].temperatura = 30.0;
+    nuevaZona.historiales[0].temperatura = nuevaZona.umbral-5;
     nuevaZona.historiales[0].fecha = '30/06/2025';
     nuevaZona.historiales[0].hora = '12:00';
+    strcpy(nuevaZona.historiales[0].ventilador, "OFF");
 
     (*cont)++;
     *zonas=realloc(*zonas, ((*cont))*sizeof(Zona));
@@ -192,9 +207,39 @@ void temperaturaActual( Zona **zonas, int *cont) {
     }
 }
 
-void activarVent(Zona **zonas, int *cont){
-    //funcion para buscar zona con nombre
-
+void activarVent(Zona **zonas, int *cont, int **contHistorial){
+    char nombreZona[50];
+    int opcion;
+    printf("Ingresa el nombre de la zona: ");
+    fgets(nombreZona, sizeof(nombreZona), stdin);
+    nombreZona[strcspn(nombreZona, "\n")] = '\0';
+    Zona *zonaEncontrada = buscarZonaPorNombre(*zonas, *cont, nombreZona);
+    int pos=posBuscarZonaPorNombre(*zonas, *cont, nombreZona);
+    if(zonaEncontrada == NULL|| pos==-1){ {
+        printf("Zona no encontrada.\n");
+        return;
+    }
+    Historial nuevoHistorial= zonaEncontrada->historiales[(*contHistorial)[pos]];
+    printf("Seleccione acción: \n");
+    printf("1. Encender ventilador\n"); 
+    printf("2. Apagar ventilador\n");   
+    scanf("%d", &opcion);
+    if(opcion==1){
+        (*contHistorial)[pos]++;
+        zonaEncontrada->historiales= realloc(zonaEncontrada->historiales, (*contHistorial)[pos]*sizeof(Historial));
+        zonaEncontrada->historiales[(*contHistorial)[pos]]=nuevoHistorial;
+        strcpy(zonaEncontrada->historiales[(*contHistorial)[pos]], "ON");
+        printf("Ventilador encendido manualmente.\n");
+    } else if(opcion==2){
+        (*contHistorial)[pos]++;
+        zonaEncontrada->historiales= realloc(zonaEncontrada->historiales, (*contHistorial)[pos]*sizeof(Historial));
+        zonaEncontrada->historiales[(*contHistorial)[pos]]=nuevoHistorial;
+        strcpy(zonaEncontrada->historiales[(*contHistorial)[pos]], "OFF");
+        printf("Ventilador apagado manualmente.\n");
+    } else {
+        printf("Opción no válida.\n");
+    }
+    }
 }
 
 void reporte(Zona **zonas, int *cont, int **contHistorial){
@@ -212,8 +257,8 @@ void reporte(Zona **zonas, int *cont, int **contHistorial){
         prom=suma/(*(contHistorial+i));
         printf("Zona: %s\n", (*zonas)[i].nom);
         printf("Reporte estadistico:\n");
-        printf("Temperatura maxima: %.2f °C\n", tempmax);
-        printf("Temperatura minima: %.2f °C\n", tempmin);
-        printf("Temperatura promedio: %.2f °C\n\n", prom); 
+        printf("Temperatura maxima: %.1f °C\n", tempmax);
+        printf("Temperatura minima: %.1f °C\n", tempmin);
+        printf("Temperatura promedio: %.1f °C\n\n", prom); 
     }
 }
