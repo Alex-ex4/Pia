@@ -6,7 +6,6 @@ typedef struct {
     int id;
     char nom[50];
     float umbral;
-    char ventilador[5];
     Historial *historiales;
 } Zona;
 
@@ -20,6 +19,7 @@ typedef struct {
     float temperatura;
     char fecha[20];
     char hora[10];
+    char ventilador[5];
 } Historial;
 
 void escribirArchivo(Zona *zonas, int cont);
@@ -27,6 +27,10 @@ void escribirArchivo(Zona *zonas, int cont);
 void agregarArchivo(Zona zona);
 
 void listaZonas(); 
+
+Zona* buscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado);
+
+int posBuscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado);
 
 float generarTemp(int min, int max);
 
@@ -41,6 +45,8 @@ int validar_usuario();
 void activarVent(Zona **zonas, int *cont);
 
 void reporte(Zona **zonas, int *cont, int **contHistorial);
+
+
 
 //void leer_cadena(const char* mensaje, char* cadena, int longitud);
 
