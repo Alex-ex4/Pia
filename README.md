@@ -69,9 +69,17 @@
     
     -void temperaturaActual( Zona **zonas, int *cont)
         Muestra la temperatura/Estado del ventilador.
-        Actuliza la temperatura y apaga o prende el ventilador ( Esta seccion seria deseable de convertir en una funcion)
+        En cada ejecucion actualiza la temperatura, y el umbral/ventilador se actualiza solo con la funcion actualizarVentilador
         [ *arr]: Es un puntero que apunta al primer elemento de zonas
 
-    -Creo que seria rentable crear una funcion que actualize tambien los datos del archivo binario y ponerla al final de cada funcion
+    - void actualizarVentilador( Zona *z)
+           Genera temperatura aleatoria en un intervalo de umbral de  [-5,+5] 
+           Actualiza el ventilador (ON / OFF)
+    - Zona* buscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado)
+           Busca el nombre de una zona en la memoria de la estructura
+    - void cambiarUmbral(Zona *arr, int cont)
+            Permite al usuario cambiar el umbral manualmente
+            Posterior a lo anterior, el ventilador se actualiza automaticamente
+    
 
 ---ESTRUCTURA---
