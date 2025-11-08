@@ -14,5 +14,8 @@ int validarLongitud( char *cadena, int minimo, int maximo );
 
 int validarRango( int numero, int minimo, int maximo );
 
+void limpiar_buffer();
+
+int validarEsFlotante( char *cadena );
 
 #endif

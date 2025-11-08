@@ -4,6 +4,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "utilidades.h"
+#include "validaciones.h"
 #define ARCHIVO_USUARIOS "usuarios.bin"
 //#define MAX_NOMBRE 50
 #define ARCHIVO "archivo.bin"
@@ -11,10 +12,92 @@
 #define ARCHIVO_EVENTOS "eventos.bin"
 
 
-void limpiar_buffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+// ===========  FUNCIONES DE VALIDACIÓN INTERNAS ===========
+
+static int leer_entero_validado(const char* mensaje, int min, int max) {
+    char buffer[20];
+    int num;
+    int es_numero, en_rango;
+
+    do {
+        printf("%s", mensaje);
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        es_numero = validarEsNumero(buffer); //
+        if (!es_numero) {
+            printf("Error: Ingrese solo números.\n");
+            en_rango = 0; 
+            continue;
+        }
+        
+        num = atoi(buffer); 
+        
+        en_rango = validarRango(num, min, max); //
+        
+        if (!en_rango) {
+            printf("Error: Ingrese un valor entre %d y %d.\n", min, max);
+        }
+
+    } while (!es_numero || !en_rango);
+    
+    return num;
 }
+
+
+static void leer_cadena_validada(const char* mensaje, char* destino, int longitud_buffer, int min_len, int max_len) {
+    int es_vacio, longitud_valida;
+
+    do {
+        printf("%s", mensaje);
+        fgets(destino, longitud_buffer, stdin);
+        destino[strcspn(destino, "\n")] = '\0';
+
+        es_vacio = validaEsVacio(destino); //
+        if (es_vacio) {
+            printf("Error: El campo no puede estar vacío.\n");
+            longitud_valida = 0; 
+            continue;
+        }
+
+        longitud_valida = validarLongitud(destino, min_len, max_len); //
+        if (!longitud_valida) {
+            printf("Error: La longitud debe estar entre %d y %d caracteres.\n", min_len, max_len);
+        }
+
+    } while (es_vacio || !longitud_valida);
+}
+
+static float leer_float_validado(const char* mensaje, float min, float max) {
+    char buffer[50]; 
+    float num;
+    int es_numero;
+
+    do {
+        printf("%s", mensaje);
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        es_numero = validarEsFlotante(buffer); 
+        
+        if (!es_numero) {
+            printf("Error: Ingrese un valor numérico válido (ej. 35.5).\n");
+            continue;
+        }
+        
+        num = atof(buffer); 
+        
+        if (num < min || num > max) {
+            printf("Error: Ingrese un valor entre %.2f y %.2f.\n", min, max);
+            es_numero = 0;
+        }
+
+    } while (!es_numero);
+    
+    return num;
+}
+
+
 
 // Edson 
 Zona* buscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado) {
@@ -25,10 +108,6 @@ Zona* buscarZonaPorNombre(Zona *arr, int cont, char *nombreBuscado) {
     }
     return NULL;
 }
-
-// aqui se llama a traves de Zona* porque necesito devolver la direccion de memoria de la zona encontrada
-// esto sirve para no cargar todo el archivo en memoria
-// la funcion no es void porque devuelve un puntero a Zona
 
 Zona* buscar_zona_por_id(int id_zona, Zona *zona) {
     FILE *archivo = fopen(ARCHIVO, "rb");
@@ -94,6 +173,7 @@ void listaZonas(){
     fclose(archivo);
 }
 
+
 int validar_usuario() {
     FILE *archivo = fopen(ARCHIVO_USUARIOS, "rb");
     if (archivo == NULL) {
@@ -111,15 +191,14 @@ int validar_usuario() {
     char password[50];
 
     printf("=== Bienvenido ===\n");
-    printf("Ingrese usuario: ");
-    fgets(usuario, 50, stdin);
-    usuario[strcspn(usuario, "\n")] = '\0';
-
-    //leer_cadena("", usuario, 50);
-    printf("Ingrese contraseña: ");
-    fgets(password, 50, stdin);
-    password[strcspn(password, "\n")] = '\0';
-    //leer_cadena("", password, 50);
+    
+    // *** MODIFICADO ***
+    // Se usa la nueva función de validación de cadenas
+    leer_cadena_validada("Ingrese usuario: ", usuario, sizeof(usuario), 1, 49);
+    
+    // *** MODIFICADO ***
+    // Se usa la nueva función de validación de cadenas
+    leer_cadena_validada("Ingrese contraseña: ", password, sizeof(password), 1, 49);
 
     archivo = fopen(ARCHIVO_USUARIOS, "rb");
     if (archivo == NULL) {
@@ -181,48 +260,37 @@ void registrar_evento(int id_zona, float temperatura, int estado_ventilador) {
 
 void registrarZona(Zona **zonas, int *cont) {
     Zona nuevaZona;
-    printf("Ingrese ID de la zona: ");
-    scanf("%d", &nuevaZona.id);
-    limpiar_buffer();
+    
+    // *** MODIFICADO (Entero) ***
+    nuevaZona.id = leer_entero_validado("Ingrese ID de la zona (1-9999): ", 1, 9999);
+    
+    // *** MODIFICADO (Cadena) ***
+    leer_cadena_validada("Ingrese nombre de la zona (1-49): ", nuevaZona.nom, sizeof(nuevaZona.nom), 1, 49);
 
-    printf("Ingrese nombre de la zona: ");
-    fgets(nuevaZona.nom, sizeof(nuevaZona.nom), stdin);
-    nuevaZona.nom[strcspn(nuevaZona.nom, "\n")] = '\0';
-
-    printf("Ingrese umbral de temperatura: ");
-    scanf("%f", &nuevaZona.umbral);
+    // *** MODIFICADO Y VALIDADO (Float) ***
+    nuevaZona.umbral = leer_float_validado(
+        "Ingrese umbral de temperatura (10.0-50.0 °C): ", 
+        10.0, 
+        50.0 
+    );
+    
     strcpy(nuevaZona.ventilador, "OFF");
 
-    // Inicializar historial
     nuevaZona.historiales = (Historial *)malloc(sizeof(Historial));
-    
-    // Generar temperatura inicial y registrar evento
     float temp_inicial = generar_temperatura_aleatoria();
     int estado_ventilador = (temp_inicial > nuevaZona.umbral) ? 1 : 0;
-    
-    // Configurar primer evento del historial
     nuevaZona.historiales[0].idZona = nuevaZona.id;
     nuevaZona.historiales[0].temperatura = temp_inicial;
     nuevaZona.historiales[0].hora = time(NULL);
     nuevaZona.historiales[0].estado_ventilador = estado_ventilador;
-    
-    // Actualizar estado del ventilador según la temperatura
     strcpy(nuevaZona.ventilador, estado_ventilador ? "ON" : "OFF");
-
-
     nuevaZona.temp_predet = nuevaZona.umbral;
-
     nuevaZona.cont_historial = 1;
-
     (*cont)++;
     *zonas = realloc(*zonas, (*cont) * sizeof(Zona));
     (*zonas)[(*cont) - 1] = nuevaZona;
-
-    // Registrar evento en el archivo de eventos
     registrar_evento(nuevaZona.id, temp_inicial, estado_ventilador);
-    
     agregarArchivo(nuevaZona);
-    
     printf("\nZona registrada exitosamente!\n");
     printf("Temperatura inicial: %.2f°C | Ventilador: %s\n", 
            temp_inicial, nuevaZona.ventilador);
@@ -239,17 +307,16 @@ void temperaturaActual( Zona **zonas, int *cont) {
     do 
     {
         printf("\n1) Zona especifica por nombre.\n2) Listar todas las zonas\n3) Volver\n");
-        printf("Seleccion: ");  
-        scanf("%d", &opcion);
+        
+        // *** MODIFICADO (Entero) ***
+        opcion = leer_entero_validado("Seleccion: ", 1, 3);
         
         switch (opcion)
         {
         case 1: 
         {
-            limpiar_buffer();
-            printf("\tIngresar el nombre de la zona: ");
-            fgets(nombre, sizeof(nombre), stdin);
-            nombre[strcspn(nombre, "\n")] = '\0';
+            // *** MODIFICADO (Cadena) ***
+            leer_cadena_validada("\tIngresar el nombre de la zona: ", nombre, sizeof(nombre), 1, 49);
             
             Zona *z = buscarZonaPorNombre(arr, *cont, nombre );
             
@@ -285,10 +352,9 @@ void activarVent(Zona **zonas, int *cont){
     }
     char nombreZona[50];
     int opcion;
-    limpiar_buffer();
-    printf("Ingresa el nombre de la zona: ");
-    fgets(nombreZona, sizeof(nombreZona), stdin);
-    nombreZona[strcspn(nombreZona, "\n")] = '\0';
+    
+    // *** MODIFICADO (Cadena) ***
+    leer_cadena_validada("Ingresa el nombre de la zona: ", nombreZona, sizeof(nombreZona), 1, 49);
 
     Zona *zonaEncontrada = buscarZonaPorNombre(*zonas, *cont, nombreZona);
     if(zonaEncontrada == NULL){ 
@@ -304,8 +370,9 @@ void activarVent(Zona **zonas, int *cont){
     printf("Seleccione acción: \n");
     printf("1. Encender ventilador\n"); 
     printf("2. Apagar ventilador\n");   
-    scanf("%d", &opcion);
-    limpiar_buffer();
+    
+    // *** MODIFICADO (Entero) ***
+    opcion = leer_entero_validado("Seleccion: ", 1, 2);
     
     Historial nuevoEvento;
     nuevoEvento.idZona = zonaEncontrada->id;
@@ -319,18 +386,17 @@ void activarVent(Zona **zonas, int *cont){
         zonaEncontrada->historiales= realloc(zonaEncontrada->historiales, zonaEncontrada->cont_historial*sizeof(Historial));
         zonaEncontrada->historiales[zonaEncontrada->cont_historial-1]=nuevoEvento;
         strcpy(zonaEncontrada->ventilador, "ON");
-        printf("Ventilador encendido manualmente.\n");
-    } else if(opcion==2){
+        printf("Ventilador encendido manually.\n");
+    } else if(opcion==2){ 
         nuevoEvento.estado_ventilador = 0;
 
         zonaEncontrada->cont_historial++;
         zonaEncontrada->historiales= realloc(zonaEncontrada->historiales, zonaEncontrada->cont_historial*sizeof(Historial));
         zonaEncontrada->historiales[zonaEncontrada->cont_historial-1]=nuevoEvento;
         strcpy(zonaEncontrada->ventilador, "OFF");
-        printf("Ventilador apagado manualmente.\n");
-    } else {
-        printf("Opción no válida.\n");
-    }
+        printf("Ventilador apagado manually.\n");
+    } 
+    
     escribirArchivo(*zonas, *cont);
     registrar_evento(nuevoEvento.idZona, nuevoEvento.temperatura, nuevoEvento.estado_ventilador);
 }
@@ -343,14 +409,13 @@ void activarVent(Zona **zonas, int *cont){
 void historial_por_zona() {
     listaZonas();
     int id_zona;
-    printf("Ingrese el ID de la zona para ver su historial: ");
-    scanf("%d", &id_zona);
-    limpiar_buffer();
+    
+    // *** MODIFICADO (Entero) ***
+    id_zona = leer_entero_validado("Ingrese el ID de la zona para ver su historial (1-9999): ", 1, 9999);
     
     Zona zona;
     if (buscar_zona_por_id(id_zona, &zona) == NULL) {
         printf("Error: Zona no encontrada.\n");
-        getchar();
         return;
     }
     
@@ -359,9 +424,6 @@ void historial_por_zona() {
 }
 
 //Aca ees donde se muestra el historial de una zona especifica
-// utilizo la libreria time.h para mostrar la fecha y hora de cada evento
-// no recuerdo si es en esta funcion pero tambien tiene algunos fallos en cuestion a lo que imprime pero no afecta la logica del programa
-// pulire mejor esos detalles despues
 void mostrar_historial_zona(int id_zona) {
     FILE *archivo = fopen(ARCHIVO_EVENTOS, "rb");
     if (archivo == NULL) {
@@ -406,24 +468,22 @@ void mostrar_historial_zona(int id_zona) {
 void simular_monitoreo_tiempo_real() {
     listaZonas();
     int id_zona;
-    printf("Ingrese el ID de la zona para simular monitoreo: ");
-    scanf("%d", &id_zona);
-    limpiar_buffer();
+    
+    // *** MODIFICADO (Entero) ***
+    id_zona = leer_entero_validado("Ingrese el ID de la zona para simular monitoreo (1-9999): ", 1, 9999);
     
     Zona zona;
     if (buscar_zona_por_id(id_zona, &zona) == NULL) {
         printf("Error: Zona no encontrada.\n");
-        getchar();
         return;
     }
     
     int ciclos;
     int intervalo;
-    printf("Ingrese número de ciclos de monitoreo: ");
-    scanf("%d", &ciclos);
-    printf("Ingrese intervalo entre ciclos (segundos): ");
-    scanf("%d", &intervalo);
-    limpiar_buffer();
+    
+    // *** MODIFICADO (Entero) ***
+    ciclos = leer_entero_validado("Ingrese número de ciclos de monitoreo (1-100): ", 1, 100);
+    intervalo = leer_entero_validado("Ingrese intervalo entre ciclos (segundos) (1-60): ", 1, 60);
 
     printf("\n=== SIMULACIÓN EN TIEMPO REAL ===\n");
     printf("Zona: %s | Umbral: %.1f°C\n", zona.nom, zona.umbral);
@@ -455,8 +515,9 @@ void simular_monitoreo_tiempo_real() {
 void buscar_eventos_rango() {
     listaZonas();
     int id_zona;
-    printf("Ingrese el ID de la zona para buscar eventos: ");
-    scanf("%d", &id_zona);
+    
+    // *** MODIFICADO (Entero) ***
+    id_zona = leer_entero_validado("Ingrese el ID de la zona para buscar eventos (1-9999): ", 1, 9999);
     
     Zona zona;
     if (buscar_zona_por_id(id_zona, &zona) == NULL) {
@@ -465,11 +526,18 @@ void buscar_eventos_rango() {
     }
     
     float temp_min, temp_max;
-    printf("Ingrese la temperatura mínima del rango: ");
-    scanf("%f", &temp_min);
-    printf("Ingrese la temperatura máxima del rango: ");
-    scanf("%f", &temp_max);
-    limpiar_buffer();
+    
+    // *** MODIFICADO Y VALIDADO (Float) ***
+    temp_min = leer_float_validado(
+        "Ingrese la temperatura mínima del rango (-50.0-100.0 °C): ", 
+        -50.0, 
+        100.0
+    );
+    temp_max = leer_float_validado(
+        "Ingrese la temperatura máxima del rango (-50.0-100.0 °C): ", 
+        -50.0, 
+        100.0
+    );
     
     printf("\n=== EVENTOS ENCONTRADOS (%.1f - %.1f °C) ===\n", temp_min, temp_max);
     printf("Zona: %s\n\n", zona.nom);
@@ -505,10 +573,10 @@ void buscar_eventos_rango() {
     }
     
     fclose(archivo);
-    getchar();
 }
 
 
+// ... (Las funciones reporte y exportar_historial_csv no leen datos, permanecen igual) ...
 void reporte(Zona **zonas, int *cont){
     float tempmax_T=0.0, tempmin_T=100.0, prom_T, suma_T=0.0;
     char zona_max[50], zona_min[50];
@@ -573,6 +641,7 @@ void exportar_historial_csv(Zona **zonas, int *cont){
     printf("Historial exportado exitosamente a %s\n", HISTORIAL);
 }
 
+
 // Edson
 //Integracion: cambiarUmbral(arr,*cont);
 // No se que pase aca pero al momento de correr el programa hay algunos fallos en la consola
@@ -582,10 +651,9 @@ void cambiarUmbral(Zona **arr, int cont) {
 
     char nombre[50];
     float nuevoUmbral;
-    limpiar_buffer();
-    printf("\tIngresar el nombre de la zona:");
-    fgets(nombre, sizeof(nombre), stdin);
-    nombre[strcspn(nombre, "\n")] = '\0';
+    
+    // *** MODIFICADO (Cadena) ***
+    leer_cadena_validada("\tIngresar el nombre de la zona:", nombre, sizeof(nombre), 1, 49);
 
     Zona *z = buscarZonaPorNombre( *arr , cont , nombre );
     if( z == NULL) {
@@ -594,9 +662,13 @@ void cambiarUmbral(Zona **arr, int cont) {
     }
     printf("> Zona _%s_ encontrada\n", z->nom);
     printf("\n\tUmbral actual: %f °C", z->umbral);
-    printf("\n\tIngrese el nuevo valor del umbral: ");
-    scanf("%f", &nuevoUmbral);
-    limpiar_buffer();
+    
+    // *** MODIFICADO Y VALIDADO (Float) ***
+    nuevoUmbral = leer_float_validado(
+        "\n\tIngrese el nuevo valor del umbral (10.0-50.0 °C): ", 
+        10.0, 
+        50.0
+    );
 
     z->umbral = nuevoUmbral;
     printf("> Umbral aztualizado correctamente.\n");
@@ -617,11 +689,11 @@ void restaurar_configuracion_default(Zona **zonas, int *cont) {
     }
     
     listaZonas();
-    limpiar_buffer();
     char nombre[50];
-    printf("Ingrese el nombre de la zona a restaurar: ");
-    fgets(nombre, sizeof(nombre), stdin);
-    nombre[strcspn(nombre, "\n")] = '\0';    
+    
+    // *** MODIFICADO (Cadena) ***
+    leer_cadena_validada("Ingrese el nombre de la zona a restaurar: ", nombre, sizeof(nombre), 1, 49);
+    
     
     // Buscar zona por nombre
     Zona *zona = buscarZonaPorNombre(*zonas, *cont, nombre);
@@ -690,40 +762,3 @@ void restaurar_configuracion_default(Zona **zonas, int *cont) {
     // Actualizar archivo de zonas
     escribirArchivo(*zonas, *cont);
 }
-
-
-
-
-/*int leer_entero(const char* mensaje) {
-    int valor;
-    printf("%s", mensaje);
-    while (scanf("%d", &valor) != 1) {
-        printf("Error: Ingrese un número entero válido: ");
-        limpiar_buffer();
-    }
-    limpiar_buffer();
-    return valor;
-}
-
-float leer_flotante(const char* mensaje) {
-    float valor;
-    printf("%s", mensaje);
-    while (scanf("%f", &valor) != 1) {
-        printf("Error: Ingrese un número válido: ");
-        limpiar_buffer();
-    }
-    limpiar_buffer();
-    return valor;
-}*/
-
-/*void leer_cadena(const char* mensaje, char* cadena, int longitud) {
-    printf("%s", mensaje);
-    if (fgets(cadena, longitud, stdin) != NULL) {
-        cadena[strcspn(cadena, "\n")] = '\0';
-    }
-}*/
-
-
-
-
-

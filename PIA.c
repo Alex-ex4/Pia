@@ -3,8 +3,18 @@
 #include <string.h>
 #include <time.h>
 #include "utilidades.h"
+#include "validaciones.h"
 #define ARCHIVO "archivo.bin"
 #define HISTORIAL "historial.csv"
+
+// Definiciones de colores ANSI para la consola
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
 int main() {
 
@@ -17,30 +27,39 @@ int main() {
     int cont = 0;
     Zona *zonas = NULL;
 
-    // aun necesito ver como arreglar todos los inconvenientes con el tema de la temperatura predeterminada y el historial
-
     int opp;
     char ops;
     
     do
     {
-        printf("\n---MENU---\n");
-        printf("1. Zonas \n");
-        printf("2. Control de Temperaturas \n");
-        printf("3. Consultas\n");
-        printf("4. Configuración\n");
-        printf("5. Salir\n");
-        printf("Seleccione una opción: ");
+
+        // ------------------------------------------
+        printf("\n" ANSI_COLOR_BLUE "=========================================" ANSI_COLOR_RESET "\n");
+        printf(ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET ANSI_COLOR_CYAN "       SISTEMA DE MONITOREO DE TEMPERATURA       " ANSI_COLOR_RESET ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET "\n");
+        printf(ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET ANSI_COLOR_CYAN "              M E N U   P R I N C I P A L        " ANSI_COLOR_RESET ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET "\n");
+        printf(ANSI_COLOR_BLUE "=========================================" ANSI_COLOR_RESET "\n");
+        printf(ANSI_COLOR_GREEN " 1. [ Z O N A S ]            " ANSI_COLOR_RESET " - Registro y Listado\n");
+        printf(ANSI_COLOR_GREEN " 2. [ C O N T R O L ]        " ANSI_COLOR_RESET " - Temperaturas y Ventiladores\n");
+        printf(ANSI_COLOR_GREEN " 3. [ C O N S U L T A S ]    " ANSI_COLOR_RESET " - Historial y Reportes\n");
+        printf(ANSI_COLOR_GREEN " 4. [ C O N F I G ]          " ANSI_COLOR_RESET " - Umbrales y Restauracion\n");
+        printf(ANSI_COLOR_RED   " 5. [ S A L I R ]            " ANSI_COLOR_RESET " - Finalizar Programa\n");
+        printf(ANSI_COLOR_BLUE "-----------------------------------------" ANSI_COLOR_RESET "\n");
+        printf(ANSI_COLOR_YELLOW "   >>> Seleccione una opcion: " ANSI_COLOR_RESET);
+        // ------------------------------------------
+        
         scanf("%d", &opp);
         switch (opp)
         {
         case 1:
             do{
-                printf("\n\t---ZONAS---\n");
-                printf("\ta. Registro de Zona\n");
-                printf("\tb. Listar zonas registradas\n");
-                printf("\tc. Volver al menú principal\n");
-                printf("\tSeleccione una opcion: ");
+                // ------------------------------------------
+                printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: ZONAS ]---\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "a. >> REGISTRAR Zona\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "b. >> LISTAR zonas registradas\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_RED   "c. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_CYAN "--------------------------\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
+                // ------------------------------------------
                 scanf(" %c", &ops);
                 getchar();
                 switch (ops)
@@ -52,10 +71,10 @@ int main() {
                     listaZonas();
                     break;
                 case 'c':
-                    printf("\tVolviendo al menú principal...\n");
+                    printf(ANSI_COLOR_MAGENTA "\tVolviendo al menu principal...\n" ANSI_COLOR_RESET);
                     break;
                 default:
-                    printf("\tOpción no válida\n");
+                    printf(ANSI_COLOR_RED "\tOpcion no valida\n" ANSI_COLOR_RESET);
                     break;
                 }
             } while (ops!='c');
@@ -63,13 +82,16 @@ int main() {
             break;
         case 2:
             do{
-                printf("\n\t---CONTROL DE TEMPERATURAS---\n");
-                printf("\ta. Ver temperatura actual\n");
-                printf("\tb. Activar ventilador manualmente\n");
-                printf("\tc. Ver historial de eventos por zona\n");
-                printf("\td. Simular monitoreo en tiempo real\n");
-                printf("\te. Volver al menú principal\n");
-                printf("\tSeleccione una opcion: ");
+                // ------------------------------------------
+                printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: CONTROL DE TEMPERATURAS ]---\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "a. >> Ver temperatura actual\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "b. >> Activar ventilador manualmente\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "c. >> Ver historial de eventos por zona\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "d. >> Simular monitoreo en tiempo real\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_RED   "e. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_CYAN "------------------------------------------\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
+                // ------------------------------------------
                 scanf(" %c", &ops);
                 switch (ops)
                 {
@@ -86,10 +108,10 @@ int main() {
                     simular_monitoreo_tiempo_real();
                     break;
                 case 'e': 
-                    printf("\tVolviendo al menú principal...\n");
+                    printf(ANSI_COLOR_MAGENTA "\tVolviendo al menu principal...\n" ANSI_COLOR_RESET);
                     break;
                 default:
-                    printf("\tOpción no válida\n");    
+                    printf(ANSI_COLOR_RED "\tOpcion no valida\n" ANSI_COLOR_RESET);    
                     break;
                 }
             } while (ops!='e');
@@ -97,12 +119,15 @@ int main() {
         case 3: 
             do
             {
-                printf("\n\t---CONSULTAS---\n");
-                printf("\ta. Buscar eventos por rango de temperatura\n");
-                printf("\tb. Generar reporte estadistico\n");
-                printf("\tc. Exportar historial a archivo csv\n");
-                printf("\td. Volver al menú principal\n");
-                printf("\tSeleccione una opcion: ");
+                // ------------------------------------------
+                printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: CONSULTAS Y REPORTES ]---\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "a. >> Buscar eventos por rango de temperatura\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "b. >> Generar reporte estadistico\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "c. >> Exportar historial a archivo CSV\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_RED   "d. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_CYAN "--------------------------------------\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
+                // ------------------------------------------
                 scanf(" %c", &ops);
                 getchar();
                 switch (ops)
@@ -117,10 +142,10 @@ int main() {
                     exportar_historial_csv(&zonas, &cont);
                     break;
                 case 'd':
-                    printf("\tVolviendo al menú principal...\n");
+                    printf(ANSI_COLOR_MAGENTA "\tVolviendo al menu principal...\n" ANSI_COLOR_RESET);
                     break;
                 default:
-                    printf("\tOpción no válida\n");
+                    printf(ANSI_COLOR_RED "\tOpcion no valida\n" ANSI_COLOR_RESET);
                     break;
                 }
             } while (ops!='d');
@@ -129,11 +154,14 @@ int main() {
         case 4:
             do
             {
-                printf("\n\t---CONFIGURACION---\n");
-                printf("\ta. Configurar umbral de temperatura por zona\n");
-                printf("\tb. Restaurar configuración por defecto por zona\n");
-                printf("\tc. Volver al menú principal\n\t");
-                printf("Seleccione una opcion: ");
+                // ------------------------------------------
+                printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: CONFIGURACION ]---\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "a. >> Configurar umbral de temperatura por zona\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "b. >> Restaurar configuracion por defecto por zona\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_RED   "c. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_CYAN "--------------------------------\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
+                // ------------------------------------------
                 scanf(" %c", &ops);
                 switch (ops)
                 {
@@ -141,28 +169,29 @@ int main() {
                     if (zonas != NULL && cont > 0) {
                         cambiarUmbral(&zonas, cont);
                     } else {
-                        printf("\tNo hay zonas registradas para configurar.\n");
+                        printf(ANSI_COLOR_RED "\tNo hay zonas registradas para configurar.\n" ANSI_COLOR_RESET);
                     }
                     break;
                 case 'b':
                     restaurar_configuracion_default(&zonas, &cont);
-                    //printf("\tFunción en desarrollo...\n");
                     break;
                 case 'c': 
-                    printf("\tVolviendo al menú principal...\n");
+                    printf(ANSI_COLOR_MAGENTA "\tVolviendo al menu principal...\n" ANSI_COLOR_RESET);
                     break;
                 default:
-                    printf("\tOpción no válida\n");
+                    printf(ANSI_COLOR_RED "\tOpcion no valida\n" ANSI_COLOR_RESET);
                     break;
                 }
             } while (ops!='c');
             
             break;
         case 5:
-            printf("Saliendo del programa...\n");
+            printf("\n" ANSI_COLOR_RED "=========================================" ANSI_COLOR_RESET "\n");
+            printf(ANSI_COLOR_RED "         Saliendo del programa... [ADIOS]    " ANSI_COLOR_RESET "\n");
+            printf(ANSI_COLOR_RED "=========================================" ANSI_COLOR_RESET "\n");
             break;
         default:
-            printf("Opción no válida.\n");
+            printf(ANSI_COLOR_RED "Opcion no valida. Intente de nuevo.\n" ANSI_COLOR_RESET);
             break;
         }
     } while (opp!=5);
@@ -179,4 +208,3 @@ int main() {
     
     return 0;
 }
-   

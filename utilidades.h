@@ -29,8 +29,6 @@ typedef struct {
 
 //Otras funciones
 
-void limpiar_buffer();
-
 float generar_temperatura_aleatoria();
 float generarTemp(int min, int max);
 
@@ -81,4 +79,5 @@ void cambiarUmbral(Zona **arr, int cont);
 //Opcion 10
 void restaurar_configuracion_default(Zona **zonas, int *cont);
 
+// Las funciones internas no se prototipan porque son estaticas del utilidades.c
 #endif
