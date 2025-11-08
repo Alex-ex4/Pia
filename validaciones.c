@@ -12,8 +12,7 @@ void limpiar_buffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// al querer solo  N cantidad de caracteres  
-// -> scanf("%4s",cadena); aqui es 4
+
 int validarEsNumero( char *cadena) {
     int i;
     for (i = 0 ; cadena[i] != '\0' ; i++) {
@@ -21,7 +20,7 @@ int validarEsNumero( char *cadena) {
             return 0;
         }
     }
-    return 1; //Exito
+    return 1; 
 }
 
 
