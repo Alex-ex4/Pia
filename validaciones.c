@@ -5,6 +5,11 @@
 #include "utilidades.h"
 #include "validaciones.h"
 
+#define ARCHIVO_USUARIOS "usuarios.bin"
+//#define MAX_NOMBRE 50
+#define ARCHIVO "archivo.bin"
+#define HISTORIAL "historial.csv"
+#define ARCHIVO_EVENTOS "eventos.bin"
 
 
 void limpiar_buffer() {
@@ -12,7 +17,8 @@ void limpiar_buffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-
+// al querer solo  N cantidad de caracteres  
+// -> scanf("%4s",cadena); aqui es 4
 int validarEsNumero( char *cadena) {
     int i;
     for (i = 0 ; cadena[i] != '\0' ; i++) {
@@ -20,7 +26,7 @@ int validarEsNumero( char *cadena) {
             return 0;
         }
     }
-    return 1; 
+    return 1; //Exito
 }
 
 
@@ -70,4 +76,52 @@ int validarEsFlotante( char *cadena )
         }
     }
     return digito_encontrado;
+}
+
+int validar_usuario() {
+    FILE *archivo = fopen(ARCHIVO_USUARIOS, "rb");
+    if (archivo == NULL) {
+        archivo = fopen(ARCHIVO_USUARIOS, "wb");
+        if (archivo != NULL) {
+            Usuario admin = {"Padron", "123456"};
+            fwrite(&admin, sizeof(Usuario), 1, archivo);
+            fclose(archivo);
+        }
+    } else {
+        fclose(archivo);
+    }
+
+    char usuario[50];
+    char password[50];
+
+    printf("=== Bienvenido ===\n");
+    
+    // *** MODIFICADO ***
+    // Se usa la nueva función de validación de cadenas
+    leer_cadena_validada("Ingrese usuario: ", usuario, sizeof(usuario), 1, 49);
+    
+    // *** MODIFICADO ***
+    // Se usa la nueva función de validación de cadenas
+    leer_cadena_validada("Ingrese contraseña: ", password, sizeof(password), 1, 49);
+
+    archivo = fopen(ARCHIVO_USUARIOS, "rb");
+    if (archivo == NULL) {
+        printf("Error: No se pudo abrir el archivo de usuarios.\n");
+        return 0;
+    }
+
+    Usuario user;
+    int encontrado = 0;
+    while (fread(&user, sizeof(Usuario), 1, archivo)) {
+        if (strcmp(user.usuario, usuario) == 0 && strcmp(user.password, password) == 0) {
+            encontrado = 1;
+            break;
+        }
+    }
+    fclose(archivo);
+
+    if (!encontrado) {
+        printf("Error: Usuario o contraseña incorrectos.\n\n");
+    }
+    return encontrado;
 }
