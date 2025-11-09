@@ -10,4 +10,10 @@ void escribirArchivo(Zona *zonas, int cont);
 
 void agregarArchivo(Zona zona);
 
+void listaZonas(); 
+
+void cargarZonasDesdeArchivo(Zona **zonas, int *cont);
+void cargarHistorialDesdeArchivo(Zona *zonas, int cont);
+
+
 #endif

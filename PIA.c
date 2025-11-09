@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include "utilidades.h"
 #include "validaciones.h"
 #include "archivos.h"
 #include "reporte.h"
-
 #define ARCHIVO "archivo.bin"
 #define HISTORIAL "historial.csv"
 
-// Definiciones de colores ANSI para la consola
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
@@ -30,39 +29,39 @@ int main() {
     int cont = 0;
     Zona *zonas = NULL;
 
+    cargarZonasDesdeArchivo(&zonas, &cont); 
+    
+    cargarHistorialDesdeArchivo(zonas, cont);
+
     int opp;
     char ops;
     
     do
     {
 
-        // ------------------------------------------
-        printf("\n" ANSI_COLOR_BLUE "========================================================" ANSI_COLOR_RESET "\n");
+        printf("\n" ANSI_COLOR_BLUE "=========================================" ANSI_COLOR_RESET "\n");
         printf(ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET ANSI_COLOR_CYAN "       SISTEMA DE MONITOREO DE TEMPERATURA       " ANSI_COLOR_RESET ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET "\n");
         printf(ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET ANSI_COLOR_CYAN "              M E N U   P R I N C I P A L        " ANSI_COLOR_RESET ANSI_COLOR_BLUE "||" ANSI_COLOR_RESET "\n");
-        printf(ANSI_COLOR_BLUE "========================================================" ANSI_COLOR_RESET "\n");
-        printf(ANSI_COLOR_GREEN " 1. [ Z O N A S ]             " ANSI_COLOR_RESET " - Registro y Listado\n");
-        printf(ANSI_COLOR_GREEN " 2. [ C O N T R O L ]         " ANSI_COLOR_RESET " - Temperaturas y Ventiladores\n");
-        printf(ANSI_COLOR_GREEN " 3. [ C O N S U L T A S ]     " ANSI_COLOR_RESET " - Historial y Reportes\n");
-        printf(ANSI_COLOR_GREEN " 4. [ C O N F I G U R A C I O N ] " ANSI_COLOR_RESET " - Umbrales y Restauracion\n");
-        printf(ANSI_COLOR_RED   " 5. [ S A L I R ]             " ANSI_COLOR_RESET " - Finalizar Programa\n");
+        printf(ANSI_COLOR_BLUE "=========================================" ANSI_COLOR_RESET "\n");
+        printf(ANSI_COLOR_GREEN " 1. [ Z O N A S ]            " ANSI_COLOR_RESET " - Registro y Listado\n");
+        printf(ANSI_COLOR_GREEN " 2. [ C O N T R O L ]        " ANSI_COLOR_RESET " - Temperaturas y Ventiladores\n");
+        printf(ANSI_COLOR_GREEN " 3. [ C O N S U L T A S ]    " ANSI_COLOR_RESET " - Historial y Reportes\n");
+        printf(ANSI_COLOR_GREEN " 4. [ C O N F I G ]          " ANSI_COLOR_RESET " - Umbrales y Restauracion\n");
+        printf(ANSI_COLOR_RED   " 5. [ S A L I R ]            " ANSI_COLOR_RESET " - Finalizar Programa\n");
         printf(ANSI_COLOR_BLUE "-----------------------------------------" ANSI_COLOR_RESET "\n");
         printf(ANSI_COLOR_YELLOW "   >>> Seleccione una opcion: " ANSI_COLOR_RESET);
-        // ------------------------------------------
         
         scanf("%d", &opp);
         switch (opp)
         {
         case 1:
             do{
-                // ------------------------------------------
                 printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: ZONAS ]---\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "a. >> REGISTRAR Zona\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "b. >> LISTAR zonas registradas\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_RED   "c. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_CYAN "--------------------------\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
-                // ------------------------------------------
                 scanf(" %c", &ops);
                 getchar();
                 switch (ops)
@@ -85,7 +84,6 @@ int main() {
             break;
         case 2:
             do{
-                // ------------------------------------------
                 printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: CONTROL DE TEMPERATURAS ]---\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "a. >> Ver temperatura actual\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "b. >> Activar ventilador manualmente\n" ANSI_COLOR_RESET);
@@ -94,7 +92,6 @@ int main() {
                 printf("\t" ANSI_COLOR_RED   "e. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_CYAN "------------------------------------------\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
-                // ------------------------------------------
                 scanf(" %c", &ops);
                 switch (ops)
                 {
@@ -105,10 +102,10 @@ int main() {
                     activarVent(&zonas, &cont);
                     break;
                 case 'c': 
-                    historial_por_zona();
+                    historial_por_zona(&zonas, &cont);
                     break;
                 case 'd':
-                    simular_monitoreo_tiempo_real();
+                    simular_monitoreo_tiempo_real(&zonas, &cont);
                     break;
                 case 'e': 
                     printf(ANSI_COLOR_MAGENTA "\tVolviendo al menu principal...\n" ANSI_COLOR_RESET);
@@ -122,21 +119,19 @@ int main() {
         case 3: 
             do
             {
-                // ------------------------------------------
                 printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: CONSULTAS Y REPORTES ]---\n" ANSI_COLOR_RESET);
-                printf("\t" ANSI_COLOR_GREEN "a. >> Buscar eventos por rango de temperatura\n" ANSI_COLOR_RESET);
+                printf("\t" ANSI_COLOR_GREEN "a. >> Buscar eventos por rango de temperatura o fecha\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "b. >> Generar reporte estadistico\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "c. >> Exportar historial a archivo CSV\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_RED   "d. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_CYAN "--------------------------------------\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
-                // ------------------------------------------
                 scanf(" %c", &ops);
                 getchar();
                 switch (ops)
                 {
                 case 'a':
-                    buscar_eventos_rango();
+                    buscar_eventos_rango(&zonas, &cont);
                     break;
                 case 'b':
                     reporte(&zonas, &cont);
@@ -157,23 +152,17 @@ int main() {
         case 4:
             do
             {
-                // ------------------------------------------
                 printf("\n" ANSI_COLOR_CYAN "\t---[ SECCION: CONFIGURACION ]---\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "a. >> Configurar umbral de temperatura por zona\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_GREEN "b. >> Restaurar configuracion por defecto por zona\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_RED   "c. << VOLVER al menu principal\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_CYAN "--------------------------------\n" ANSI_COLOR_RESET);
                 printf("\t" ANSI_COLOR_YELLOW "Seleccione una opcion: " ANSI_COLOR_RESET);
-                // ------------------------------------------
                 scanf(" %c", &ops);
                 switch (ops)
                 {
                 case 'a':
-                    if (zonas != NULL && cont > 0) {
-                        cambiarUmbral(&zonas, cont);
-                    } else {
-                        printf(ANSI_COLOR_RED "\tNo hay zonas registradas para configurar.\n" ANSI_COLOR_RESET);
-                    }
+                    cambiarUmbral(&zonas, cont);
                     break;
                 case 'b':
                     restaurar_configuracion_default(&zonas, &cont);
@@ -199,7 +188,6 @@ int main() {
         }
     } while (opp!=5);
     
-    // Liberar memoria gg
     if (zonas != NULL) {
         for (int i = 0; i < cont; i++) {
             if (zonas[i].historiales != NULL) {

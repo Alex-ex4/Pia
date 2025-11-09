@@ -6,14 +6,24 @@
 #include "utilidades.h"
 #include "validaciones.h"
 #include "archivos.h"
-#define ARCHIVO_USUARIOS "usuarios.bin"
-//#define MAX_NOMBRE 50
 #define ARCHIVO "archivo.bin"
+#define HISTORIAL "historial.csv"
 #define HISTORIAL "historial.csv"
 #define ARCHIVO_EVENTOS "eventos.bin"
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
-void reporte(Zona **zonas, int *cont) {
+void reporte(Zona **zonas, int *cont){
+    if(*zonas == NULL || *cont <= 0){
+        printf(ANSI_COLOR_RED "\tNo hay zonas registradas.\n" ANSI_COLOR_RESET);
+        return;
+    }
     float tempmax_T=0.0, tempmin_T=100.0, prom_T, suma_T=0.0;
     char zona_max[50], zona_min[50];
     int num_eventos=0;
@@ -55,7 +65,11 @@ void reporte(Zona **zonas, int *cont) {
 }
 
 
-void exportar_historial_csv(Zona **zonas, int *cont) {
+void exportar_historial_csv(Zona **zonas, int *cont){
+    if(*zonas == NULL || *cont <= 0){
+        printf(ANSI_COLOR_RED "\tNo hay zonas registradas.\n" ANSI_COLOR_RESET);
+        return;
+    }
     FILE *archivo_csv = fopen(HISTORIAL, "w");
     if(archivo_csv==NULL){
         printf("Error al crear el archivo CSV.\n");
@@ -63,6 +77,9 @@ void exportar_historial_csv(Zona **zonas, int *cont) {
     }
     fprintf(archivo_csv, "ID Zona,Fecha,Hora,Temperatura,Estado Ventilador\n");
     for(int i=0;i<*cont;i++){
+        if ((*zonas)[i].cont_historial == 0) {
+            continue;
+        }
         for(int j=0;j<(*zonas)[i].cont_historial;j++){
             struct tm* tiempo = localtime(&(*zonas)[i].historiales[j].hora);
             fprintf(archivo_csv, "%d,[%02d/%02d],[%02d:%02d:%02d],%.2f,%s\n",
