@@ -1,3 +1,6 @@
+//Lázaro Alejandro Silva Santos 2115990
+//Edson Armando Amaya Macias 2151976
+//Francisco Blanco Morales 2118882
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -198,4 +201,5 @@ int main() {
     }
     
     return 0;
+
 }
